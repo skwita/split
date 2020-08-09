@@ -3,7 +3,7 @@ import org.kohsuke.args4j.*;
 import java.io.*;
 
 public class Split {
-    private int countFiles = 1;
+    private int countFiles = 0;
 
     @Option(name = "-d", usage = "defines output files names")
     private boolean isNameNum = true;
@@ -21,7 +21,7 @@ public class Split {
     private String defaultName = "x";
 
     @Argument(required = true, usage = "input file name")
-    private String inpFileName;
+    String inpFileName;
 
     public void start() throws IOException {
         if (defaultName.equals("-")) defaultName = inpFileName;
@@ -47,26 +47,24 @@ public class Split {
         if (isNameNum) {
             result += countFiles;
         } else {
-            if (countFiles <= 26) {
-                result += "a" + (char) ((int) 'a' + countFiles - 1);
-            } else result += (char) ((int) 'a' + (countFiles - 1) / 26) + +(char) ((int) 'a' + (countFiles - 1) % 26);
+            result += (char) ((int) 'a' + (countFiles - 1) / 26) + +(char) ((int) 'a' + (countFiles - 1) % 26);
         }
         return result;
     }
 
     public void preProcess(boolean isChar, int length) throws IOException {
         boolean isEnd = false;
+        FileInputStream fileInputStream = new FileInputStream(inpFileName);
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(inpFileName));
         while (!isEnd) {
-            File file = new File(getName() + ".txt");
             countFiles++;
+            File file = new File(getName() + ".txt");
             if (isChar) {
-                FileInputStream reader = new FileInputStream(inpFileName);
                 FileOutputStream writer = new FileOutputStream(file);
-                isEnd = process(length, reader, writer);
+                isEnd = process(length, fileInputStream, writer);
             } else {
-                BufferedReader reader = new BufferedReader(new FileReader(inpFileName));
                 BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-                isEnd = process(length, reader, writer);
+                isEnd = process(length, bufferedReader, writer);
             }
         }
     }
@@ -101,5 +99,3 @@ public class Split {
         return false;
     }
 }
-
-
