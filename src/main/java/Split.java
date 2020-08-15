@@ -3,10 +3,10 @@ import org.kohsuke.args4j.*;
 import java.io.*;
 
 public class Split {
-    private int countFiles = 0;
+    private int countFiles;
 
     @Option(name = "-d", usage = "defines output files names")
-    private boolean isNameNum = true;
+    private boolean isNameNum = false;
 
     @Option(name = "-l", usage = "output files length in strings", forbids = {"-n", "-c"})
     private int lengthInStrings = -1;
@@ -24,9 +24,10 @@ public class Split {
     String inpFileName;
 
     public void start() throws IOException {
+        countFiles = 0;
         if (defaultName.equals("-")) defaultName = inpFileName;
         if (numOfFiles != -1) {
-            BufferedReader reader = new BufferedReader(new FileReader(inpFileName));
+            BufferedReader reader = new BufferedReader(new FileReader("texts\\" + inpFileName + ".txt"));
             LineNumberReader lineNumberReader = new LineNumberReader(reader);
             int lineNumber = 0;
             while (lineNumberReader.readLine() != null) lineNumber++;
@@ -47,53 +48,46 @@ public class Split {
         if (isNameNum) {
             result += countFiles;
         } else {
-            result += (char) ((int) 'a' + (countFiles - 1) / 26) + +(char) ((int) 'a' + (countFiles - 1) % 26);
+            result += (char) ((int) 'a' + (countFiles - 1) / 26);
+            result += (char) ((int) 'a' + (countFiles - 1) % 26);
         }
         return result;
     }
 
     public void preProcess(boolean isChar, int length) throws IOException {
         boolean isEnd = false;
-        FileInputStream fileInputStream = new FileInputStream(inpFileName);
-        BufferedReader bufferedReader = new BufferedReader(new FileReader(inpFileName));
+        BufferedReader bufferedReader = new BufferedReader(new FileReader("texts\\" + inpFileName + ".txt"));
         while (!isEnd) {
             countFiles++;
-            File file = new File(getName() + ".txt");
-            if (isChar) {
-                FileOutputStream writer = new FileOutputStream(file);
-                isEnd = process(length, fileInputStream, writer);
-            } else {
-                BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-                isEnd = process(length, bufferedReader, writer);
-            }
+            File file = new File("texts\\expected\\" + getName() + ".txt");
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            isEnd = process(length, bufferedReader, writer, isChar);
+            writer.close();
         }
     }
 
-    public boolean process(int length, BufferedReader reader, BufferedWriter writer) throws IOException {
-        String temp;
-        for (int i = 0; i < length; i++) {
-            temp = reader.readLine();
-            if (temp != null) {
-                writer.write(temp);
-            } else {
-                writer.close();
-                reader.close();
-                return true;
+    public boolean process(int length, BufferedReader reader, BufferedWriter writer, boolean isChar) throws IOException {
+        if (!isChar) {
+            String temp;
+            for (int i = 0; i < length; i++) {
+                temp = reader.readLine();
+                if (temp != null) {
+                    writer.write(temp);
+                } else {
+                    reader.close();
+                    return true;
+                }
             }
-        }
-        return false;
-    }
-
-    public boolean process(int length, FileInputStream reader, FileOutputStream writer) throws IOException {
-        int temp;
-        for (int i = 0; i < length; i++) {
-            temp = reader.read();
-            if (temp != -1) {
-                writer.write(temp);
-            } else {
-                writer.close();
-                reader.close();
-                return true;
+        } else {
+            int temp;
+            for (int i = 0; i < length; i++) {
+                temp = reader.read();
+                if (temp != -1) {
+                    writer.write(temp);
+                } else {
+                    reader.close();
+                    return true;
+                }
             }
         }
         return false;

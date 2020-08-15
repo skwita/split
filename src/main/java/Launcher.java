@@ -10,9 +10,7 @@ public class Launcher {
         try {
             parser.parseArgument(args);
             split.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (CmdLineException e) {
+        } catch (IOException | CmdLineException e) {
             e.printStackTrace();
         }
     }

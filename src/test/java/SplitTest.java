@@ -3,17 +3,53 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.apache.commons.io.FileUtils.contentEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SplitTest {
     @Test
     public void test() throws IOException {
-        File initial = new File("texts/initial");
         Launcher.main("-d -l 4 -o - initial".split(" "));
-//        System.out.println(initial.getCanonicalPath());
-        assertEquals(new File("initial1"), new File("expected/-l/-1exp"));
-        Launcher.main("-c 150 -o First".split(" "));
-        Launcher.main("-n 3 First".split(" "));
+        assertTrue(contentEquals(
+                new File("initial1.txt"),
+                new File("expected\\-l\\t1.txt")));
+        assertTrue(contentEquals(
+                new File("initial2.txt"),
+                new File("expected\\-l\\t2.txt")));
+        assertTrue(contentEquals(
+                new File("initial3.txt"),
+                new File("expected\\-l\\t3.txt")));
+
+        Launcher.main("-d -c 150 initial".split(" "));
+        assertTrue(contentEquals(
+                new File("x1.txt"),
+                new File("expected\\-c\\t1.txt")));
+        assertTrue(contentEquals(
+                new File("x2.txt"),
+                new File("expected\\-c\\t2.txt")));
+        assertTrue(contentEquals(
+                new File("x3.txt"),
+                new File("expected\\-c\\t3.txt")));
+        assertTrue(contentEquals(
+                new File("x4.txt"),
+                new File("expected\\-c\\t4.txt")));
+        assertTrue(contentEquals(
+                new File("x5.txt"),
+                new File("expected\\-c\\t5.txt")));
+       assertTrue(contentEquals(
+                new File("x6.txt"),
+                new File("expected\\-c\\t6.txt")));
+
+        Launcher.main("-n 3 initial".split(" "));
+        assertTrue(contentEquals(
+                new File("xaa.txt"),
+                new File("expected\\-n\\t1.txt")));
+        assertTrue(contentEquals(
+                new File("xab.txt"),
+                new File("expected\\-n\\t2.txt")));
+        assertTrue(contentEquals(
+                new File("xac.txt"),
+                new File("expected\\-n\\t3.txt")));
     }
 
 }
