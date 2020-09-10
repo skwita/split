@@ -27,13 +27,12 @@ public class Split {
         countFiles = 0;
         if (defaultName.equals("-")) defaultName = inpFileName;
         if (numOfFiles != -1) {
-            BufferedReader reader = new BufferedReader(new FileReader("texts\\" + inpFileName + ".txt"));
-            LineNumberReader lineNumberReader = new LineNumberReader(reader);
-            int lineNumber = 0;
-            while (lineNumberReader.readLine() != null) lineNumber++;
-            lineNumberReader.close();
-            int linesInFile = (int) Math.ceil((double) lineNumber / numOfFiles);
-            preProcess(false, linesInFile);
+            try (BufferedReader reader = new BufferedReader(new FileReader("texts\\" + inpFileName + ".txt"))) {
+                int lineNumber = 0;
+                while (reader.readLine() != null) lineNumber++;
+                int linesInFile = (int) Math.ceil((double) lineNumber / numOfFiles);
+                preProcess(false, linesInFile);
+            }
         } else if (lengthInChars != -1) {
             preProcess(true, lengthInChars);
         } else if (lengthInStrings != -1) {
@@ -56,38 +55,31 @@ public class Split {
 
     public void preProcess(boolean isChar, int length) throws IOException {
         boolean isEnd = false;
-        BufferedReader bufferedReader = new BufferedReader(new FileReader("texts\\" + inpFileName + ".txt"));
-        while (!isEnd) {
-            countFiles++;
-            File file = new File("texts\\expected\\" + getName() + ".txt");
-            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            isEnd = process(length, bufferedReader, writer, isChar);
-            writer.close();
+        try (BufferedReader reader = new BufferedReader(new FileReader("texts\\" + inpFileName + ".txt"))) {
+            while (!isEnd) {
+                countFiles++;
+                File file = new File("texts\\expected\\" + getName() + ".txt");
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+                    isEnd = process(length, reader, writer, isChar);
+                }
+            }
         }
     }
 
     public boolean process(int length, BufferedReader reader, BufferedWriter writer, boolean isChar) throws IOException {
-        if (!isChar) {
-            String temp;
-            for (int i = 0; i < length; i++) {
-                temp = reader.readLine();
-                if (temp != null) {
-                    writer.write(temp);
-                } else {
-                    reader.close();
-                    return true;
-                }
-            }
-        } else {
-            int temp;
-            for (int i = 0; i < length; i++) {
-                temp = reader.read();
-                if (temp != -1) {
-                    writer.write(temp);
-                } else {
-                    reader.close();
-                    return true;
-                }
+        for (int i = 0; i < length; i++) {
+            String tempStr;
+            int tempInt;
+            if (isChar){
+                tempInt = reader.read();
+                if (tempInt != -1){
+                    writer.write(tempInt);
+                } else return true;
+            } else {
+                tempStr = reader.readLine();
+                if (tempStr != null){
+                    writer.write(tempStr);
+                } else return true;
             }
         }
         return false;

@@ -1,4 +1,4 @@
-import org.junit.jupiter.api.Test;
+import org.junit.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -6,7 +6,7 @@ import java.io.IOException;
 import static org.apache.commons.io.FileUtils.contentEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class SplitTest {
+public class SplitTest {
     @Test
     public void test() throws IOException {
         Launcher.main("-d -l 4 -o - initial".split(" "));
